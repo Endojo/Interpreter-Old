@@ -1,0 +1,13 @@
+//ganzzahl
+//int a = 1; //nur unterstützte tokens:
+int = ;
+
+//reelle zahl
+//real b = 9.3;
+
+//wert automatisch ermittelt
+//auto c = -6; //int
+//auto d = 9.3; //real
+
+//typ kann sich zur laufzeit ändern
+//var e = -8.9;
