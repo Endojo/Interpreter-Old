@@ -5,7 +5,7 @@
 
 struct FileStream
 {
-	FileStream(const std::string &fileName) : mPos(0)
+	FileStream(const std::string &fileName) : mPos(0), sane(true)
 	{
 		std::ifstream file(fileName, std::ios::binary);
 
@@ -30,6 +30,55 @@ struct FileStream
 		return line;
 	}
 
+	//reads in all alphanumericals
+	std::string getName()
+	{
+		std::string name;
+
+		while (std::isalnum(mContent[mPos]))
+		{
+			name += mContent[mPos];
+			mPos++;
+		}
+
+		return name;
+	}
+
+	//valid number characters
+	bool isNumComponent(char c)
+	{
+		const char* valid = "0123456789+-.";
+		return strchr(valid, c) != nullptr;
+	}
+
+	//reads in all valid number characters
+	std::string getNum()
+	{
+		std::string num;
+
+		while (isNumComponent(mContent[mPos]))
+		{
+			num += mContent[mPos];
+			mPos++;
+		}
+
+		return num;
+	}
+
+	//reads in anything until the next whitespace
+	std::string getWord()
+	{
+		std::string word;
+
+		while (!std::isspace(mContent[mPos]))
+		{
+			word += mContent[mPos];
+			mPos++;
+		}
+
+		return word;
+	}
+
 	//advances mPos
 	void skipWS()
 	{
@@ -42,10 +91,12 @@ struct FileStream
 
 	bool operator>>(Token &tok)
 	{
-		if (mPos == mContent.size())
+		if (mPos == mContent.size() || !sane)
 			return false;
 
-		for (auto it = TokenTypeNames.begin(); it != TokenTypeNames.end(); ++it)
+		bool found = false;
+
+		for (auto it = TokenTypeNames.begin(); it != TokenTypeNames.end() && !found; ++it)
 		{
 			size_t token_length = it->first.size();
 
@@ -58,7 +109,28 @@ struct FileStream
 				if (tok.type == TokType::COMMENT)
 					tok.str = getLine('\n');
 
-				break;
+				found = true;
+			}
+		}
+
+		//no matching token found
+		if (!found)
+		{
+			if (std::isalpha(mContent[mPos]))
+			{
+				tok.type = TokType::NAME;
+				tok.str = getName();
+			}
+			else if (isNumComponent(mContent[mPos]))
+			{
+				tok.type = TokType::NUMBER;
+				tok.str = getNum();
+			}
+			else
+			{
+				tok.type = TokType::UNEXPECTED;
+				tok.str = mContent[mPos];
+				sane = false;
 			}
 		}
 
@@ -68,6 +140,7 @@ struct FileStream
 
 	size_t mPos;
 	std::string mContent;
+	bool sane;
 };
 
 CodeReader::CodeReader(const std::string & fileName)
@@ -89,9 +162,17 @@ std::ostream& operator<< (std::ostream &out, const CodeReader &reader)
 {
 	for (auto it = reader.mCode.begin(); it != reader.mCode.end(); ++it)
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
+		if (it->type == TokType::UNEXPECTED)
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+		else if (it->str.empty())
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 3);
+		else
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
+
 		out << DEBUG.find(it->type)->second << " ";
+
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+
 		out << it->str << std::endl;
 	}
 

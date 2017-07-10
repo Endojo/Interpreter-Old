@@ -1,5 +1,5 @@
-#include "CodeReader.h"
 #include <iostream>
+#include "CodeReader.h"
 
 int main()
 {

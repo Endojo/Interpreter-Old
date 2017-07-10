@@ -11,10 +11,14 @@ enum class TokType
 {
 	ASSIGNMENT,
 	INTEGER,
+	REAL,
+	AUTO,
+	VAR,
 	COMMENT,
 	SEMICOLON,
 	NUMBER,
-	NAME
+	NAME,
+	UNEXPECTED
 };
 
 struct Token
@@ -25,18 +29,27 @@ struct Token
 
 const std::map<std::string, TokType> TokenTypeNames
 {
-	{"=", TokType::ASSIGNMENT },
-	{"int", TokType::INTEGER  },
-	{"//" , TokType::COMMENT  },
-	{";", TokType::SEMICOLON  }
+	{ "=", TokType::ASSIGNMENT },
+	{ "int", TokType::INTEGER  },
+	{ "real", TokType::REAL },
+	{ "var", TokType::VAR },
+	{ "auto", TokType::AUTO },
+	{ "//" , TokType::COMMENT  },
+	{ ";", TokType::SEMICOLON  }
 };
 
 const std::map<TokType, std::string> DEBUG
 {
 	{ TokType::ASSIGNMENT, "ASSIGNMENT" },
-	{ TokType::INTEGER, "INTEGER" },
+	{ TokType::INTEGER, "INT" },
+	{ TokType::REAL, "REAL" },
+	{ TokType::AUTO, "AUTO" },
+	{ TokType::VAR, "VAR" },
 	{ TokType::COMMENT, "COMMENT" },
-	{ TokType::SEMICOLON, "SEMICOLON" }
+	{ TokType::SEMICOLON, "SEMICOLON" },
+	{ TokType::NAME, "NAME" },
+	{ TokType::NUMBER, "NUMBER" },
+	{ TokType::UNEXPECTED, "ERROR: UNEXPECTED" }
 };
 
 class CodeReader
