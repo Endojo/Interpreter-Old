@@ -7,8 +7,9 @@
 #include <vector>
 #include <map>
 
-enum class TokType
+enum class Token
 {
+	END_OF_FILE = 0,
 	ASSIGNMENT,
 	INTEGER,
 	REAL,
@@ -16,41 +17,87 @@ enum class TokType
 	VAR,
 	COMMENT,
 	SEMICOLON,
-	NUMBER,
-	NAME,
-	UNEXPECTED
+	STRING,
+	NO_TOKEN
 };
 
-struct Token
+const std::map<std::string, Token> String2Token
 {
-	std::string str;
-	TokType type;
+	{ "=", Token::ASSIGNMENT },
+	{ "int", Token::INTEGER  },
+	{ "real", Token::REAL },
+	{ "var", Token::VAR },
+	{ "auto", Token::AUTO },
+	{ "//" , Token::COMMENT  },
+	{ ";", Token::SEMICOLON  },
+	{ "\"", Token::STRING}
 };
 
-const std::map<std::string, TokType> TokenTypeNames
+const std::map<Token, std::string> TOken2String
 {
-	{ "=", TokType::ASSIGNMENT },
-	{ "int", TokType::INTEGER  },
-	{ "real", TokType::REAL },
-	{ "var", TokType::VAR },
-	{ "auto", TokType::AUTO },
-	{ "//" , TokType::COMMENT  },
-	{ ";", TokType::SEMICOLON  }
+	{ Token::ASSIGNMENT, "ASSIGNMENT" },
+	{ Token::INTEGER, "INT" },
+	{ Token::REAL, "REAL" },
+	{ Token::AUTO, "AUTO" },
+	{ Token::VAR, "VAR" },
+	{ Token::SEMICOLON, "SEMICOLON" },
+	{ Token::STRING, "STRING" }
 };
 
-const std::map<TokType, std::string> DEBUG
+class FileParser
 {
-	{ TokType::ASSIGNMENT, "ASSIGNMENT" },
-	{ TokType::INTEGER, "INT" },
-	{ TokType::REAL, "REAL" },
-	{ TokType::AUTO, "AUTO" },
-	{ TokType::VAR, "VAR" },
-	{ TokType::COMMENT, "COMMENT" },
-	{ TokType::SEMICOLON, "SEMICOLON" },
-	{ TokType::NAME, "NAME" },
-	{ TokType::NUMBER, "NUMBER" },
-	{ TokType::UNEXPECTED, "ERROR: UNEXPECTED" }
+public:
+	FileParser(const std::string &fileName);
+
+	//useful for comments
+	void skipLine();
+
+	//reads in after it hits a String-end Token
+	//and sets the position to after that
+	std::string getString();
+
+	//if this returns Token::NO_TOKEN the word after that
+	//might be either a name of a variable or a number
+	//use getWord() to read it in and parse it later
+	Token getNextToken();
+
+	//reads in until it hits the next token or whitespace
+	std::string getWord();
 };
+
+parse()
+{
+	Token tok = FileParser.getNextToken();
+
+	//parses the file into a stream of commands
+	//this stream has to be able to hold
+	// a) the tokens
+	// b) strings, marked as such
+	// c) arbitrary strings, later parsed to variable names or numbers
+
+	while (tok)
+	{
+		if (tok == COMMENT)
+			skipLine();
+
+		else if (tok == NO_TOKEN)
+		{
+			string = FileParser.getWord();
+			addToStream(string);
+		}
+
+		else if (tok == STRING)
+		{
+			string = FileParser.getString();
+			addToStream(string);
+		}
+
+		else
+			addToStream(tok);
+
+		tok = FileParser.getNextToken();
+	}
+}
 
 class CodeReader
 {

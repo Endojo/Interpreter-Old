@@ -10,3 +10,13 @@ auto d = 9.3; //real
 
 //typ kann sich zur laufzeit ändern
 var e = -8.9;
+
+//Token: // ; = " int real auto var string
+//dabei muss auf die Wörter ein Leerzeichen folgen.
+//Kommentar ließt ein bis Zeilenende kommt, String bis zweites "
+
+//Namen: Beginnt mit A..Z/a..z/_ Setzt fort mit A..Z/a..z/_/0..9
+//wird eingelesen bis ein Zeichen folgt, dass diese kriterien nicht erfüllt
+
+//Zahlen: (+/-)0..9 . 0..9 E 0..9
+//z.B. 69 / -8.3 / 1.25E20
